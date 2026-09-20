@@ -1,20 +1,21 @@
 module systolic_array #(
     parameter WIDTH = 8,
-    parameter SIZE = 4
+    parameter SIZE = 4,
+    parameter ACC_WIDTH = 32
 )(
     input logic clk,
     input logic reset,
     
-    input logic [WIDTH-1:0] a_in [SIZE],
-    input logic [WIDTH-1:0] b_in [SIZE],
+    input logic signed [WIDTH-1:0] a_in [SIZE],
+    input logic signed [WIDTH-1:0] b_in [SIZE],
     
-    output [31:0] c [SIZE][SIZE]
+    output signed [ACC_WIDTH-1:0] c [SIZE][SIZE]
 );
 
     // instantiate wires
 
-    logic [WIDTH-1:0] a_wire [SIZE][SIZE];
-    logic [WIDTH-1:0] b_wire [SIZE][SIZE];
+    logic signed [WIDTH-1:0] a_wire [SIZE][SIZE];
+    logic signed [WIDTH-1:0] b_wire [SIZE][SIZE];
 
 
     genvar row;
@@ -24,8 +25,8 @@ module systolic_array #(
         for (row = 0; row < SIZE; row = row + 1) begin : gen_row
             for (col = 0; col < SIZE; col = col +1) begin : gen_col
 
-                logic [WIDTH-1:0] a_pe_in;
-                logic [WIDTH-1:0] b_pe_in;
+                logic signed [WIDTH-1:0] a_pe_in;
+                logic signed [WIDTH-1:0] b_pe_in;
                 
                 // connect the wires to the PEs
                 if (col == 0) begin 
@@ -43,7 +44,8 @@ module systolic_array #(
 
                 // instantiate PE's
                 pe #(
-                    .WIDTH(WIDTH)
+                    .WIDTH(WIDTH),
+                    .ACC_WIDTH(ACC_WIDTH)
                 ) pe_inst (
                     .clk(clk),
                     .reset(reset),

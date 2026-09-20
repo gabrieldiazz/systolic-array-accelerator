@@ -2,14 +2,15 @@ module systolic_array_2x2_tb;
     logic clk;
     logic reset;
 
-    logic [7:0] a_in [2];
-    logic [7:0] b_in [2];
+    logic signed [7:0] a_in [2];
+    logic signed [7:0] b_in [2];
 
-    wire [31:0] c [2][2];
+    wire signed [31:0] c [2][2];
 
     systolic_array #(
         .WIDTH(8),
-        .SIZE(2)
+        .SIZE(2),
+        .ACC_WIDTH(32)
     ) dut (
         .clk(clk),
         .reset(reset),
