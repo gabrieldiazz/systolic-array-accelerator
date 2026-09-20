@@ -6,10 +6,10 @@ module systolic_array #(
     input logic clk,
     input logic reset,
     
-    input logic signed [WIDTH-1:0] a_in [SIZE],
-    input logic signed [WIDTH-1:0] b_in [SIZE],
-    
-    output signed [ACC_WIDTH-1:0] c [SIZE][SIZE]
+    input logic signed [SIZE*WIDTH-1:0] a_in,
+    input logic signed [SIZE*WIDTH-1:0] b_in,
+
+    output logic signed [SIZE*SIZE*ACC_WIDTH-1:0] c
 );
 
     // instantiate wires
@@ -30,13 +30,13 @@ module systolic_array #(
                 
                 // connect the wires to the PEs
                 if (col == 0) begin 
-                    assign a_pe_in = a_in[row];
+                    assign a_pe_in = a_in[row*WIDTH +: WIDTH];
                 end 
                 else begin
                     assign a_pe_in = a_wire[row][col-1];
                 end
                 if(row == 0) begin
-                    assign b_pe_in = b_in[col];
+                    assign b_pe_in = b_in[col*WIDTH +: WIDTH];
                 end
                 else begin 
                     assign b_pe_in = b_wire[row-1][col];
@@ -53,7 +53,7 @@ module systolic_array #(
                     .b_in(b_pe_in),
                     .a_out(a_wire[row][col]),
                     .b_out(b_wire[row][col]),
-                    .acc(c[row][col])
+                    .acc(c[(row*SIZE + col)*ACC_WIDTH +: ACC_WIDTH])
                 );
             end
         end

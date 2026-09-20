@@ -11,10 +11,10 @@ module systolic_array_file_tb;
     logic clk;
     logic reset;
 
-    logic signed [7:0] a_in [3];
-    logic signed [7:0] b_in [3];
+    logic signed [23:0] a_in;
+    logic signed [23:0] b_in;
 
-    wire signed [31:0] c [3][3];
+    wire signed [287:0] c;
 
     systolic_array #(
         .WIDTH(8),
@@ -37,13 +37,13 @@ module systolic_array_file_tb;
         input logic signed [7:0] b1,
         input logic signed [7:0] b2
     );
-        a_in[0] = a0;
-        a_in[1] = a1;
-        a_in[2] = a2;
+        a_in[0  +: 8] = a0;
+        a_in[8  +: 8] = a1;
+        a_in[16 +: 8] = a2;
 
-        b_in[0] = b0;
-        b_in[1] = b1;
-        b_in[2] = b2;
+        b_in[0  +: 8] = b0;
+        b_in[8  +: 8] = b1;
+        b_in[16 +: 8] = b2;
     endtask
 
     initial begin
@@ -109,12 +109,12 @@ module systolic_array_file_tb;
         for (int t=0; t<5; t = t+1) begin
             for (int i=0; i<3; i = i+1) begin
                 if ((t-i) >= 0 && (t-i) < 3) begin 
-                    a_in[i] = A[i][t-i];
-                    b_in[i] = B[t-i][i];
+                    a_in[i*8 +: 8] = A[i][t-i];
+                    b_in[i*8 +: 8] = B[t-i][i];
                 end
                 else begin
-                    a_in[i] = 0;
-                    b_in[i] = 0;
+                    a_in[i*8 +: 8] = 0;
+                    b_in[i*8 +: 8] = 0;
                 end
             end
             
@@ -132,7 +132,12 @@ module systolic_array_file_tb;
 
         $display("C:");
         for (int i = 0; i < 3; i = i + 1) begin
-            $display("%0d %0d %0d", c[i][0], c[i][1], c[i][2]);
+            $display(
+                "%0d %0d %0d",
+                $signed(c[(i*3 + 0)*32 +: 32]),
+                $signed(c[(i*3 + 1)*32 +: 32]),
+                $signed(c[(i*3 + 2)*32 +: 32])
+            );
         end
 
         output_file = $fopen("verification/output.txt", "w");
@@ -145,9 +150,9 @@ module systolic_array_file_tb;
             $fdisplay(
                 output_file,
                 "%0d %0d %0d",
-                c[i][0],
-                c[i][1],
-                c[i][2]
+                $signed(c[(i*3 + 0)*32 +: 32]),
+                $signed(c[(i*3 + 1)*32 +: 32]),
+                $signed(c[(i*3 + 2)*32 +: 32])
             );
         end
 
