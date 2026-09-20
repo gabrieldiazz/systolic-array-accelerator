@@ -21,12 +21,12 @@ module systolic_array_3x3_tb;
 
     // helper task to simplify setting systolic array inputs
     task set_inputs(
-        input logic [7:0] a0,
-        input logic [7:0] a1,
-        input logic [7:0] a2,
-        input logic [7:0] b0,
-        input logic [7:0] b1,
-        input logic [7:0] b2
+        input logic signed [7:0] a0,
+        input logic signed [7:0] a1,
+        input logic signed [7:0] a2,
+        input logic signed [7:0] b0,
+        input logic signed [7:0] b1,
+        input logic signed [7:0] b2
     );
         a_in[0] = a0;
         a_in[1] = a1;
@@ -132,7 +132,78 @@ module systolic_array_3x3_tb;
             else $error("matrix multiplication failed at c[2][1]");
         assert(c[2][2] == 90)
             else $error("matrix multiplication failed at c[2][2]");
-       
+        
+        // Reset before signed matrix test
+        reset = 1;
+        set_inputs(0, 0, 0,  0, 0, 0);
+
+        @(posedge clk);
+        #1;
+
+        // Signed matrix multiplication:
+        //
+        // A = [ 1  -2   3]    B = [-1   2  -3]
+        //     [-4   5  -6]        [ 4  -5   6]
+        //     [ 7  -8   9]        [-7   8  -9]
+        //
+        // Expected:
+        // C = A x B = [-30   36  -42]
+        //             [ 66  -81   96]
+        //             [-102 126 -150]
+        //
+        // Tests signed arithmetic and propagation of negative values
+        // through multiple processing elements in the systolic array.
+
+        reset = 0;
+        set_inputs(1, 0, 0,  -1, 0, 0);
+        @(posedge clk);
+        #1;
+
+        set_inputs(-2, -4, 0,  4, 2, 0);
+        @(posedge clk);
+        #1;
+
+        set_inputs(3, 5, 7,  -7, -5, -3);
+        @(posedge clk);
+        #1;
+
+        set_inputs(0, -6, -8,  0, 8, 6);
+        @(posedge clk);
+        #1;
+
+        set_inputs(0, 0, 9,  0, 0, -9);
+        @(posedge clk);
+        #1;
+
+        // Flush
+        set_inputs(0, 0, 0,  0, 0, 0);
+        @(posedge clk);
+        #1;
+
+        set_inputs(0, 0, 0,  0, 0, 0);
+        @(posedge clk);
+        #1;
+
+        assert(c[0][0] == -30)
+            else $error("matrix multiplication failed at c[0][0]");
+        assert(c[0][1] == 36)
+            else $error("matrix multiplication failed at c[0][1]");
+        assert(c[0][2] == -42)
+            else $error("matrix multiplication failed at c[0][2]");
+        assert(c[1][0] == 66)
+            else $error("matrix multiplication failed at c[1][0]");
+        assert(c[1][1] == -81)
+            else $error("matrix multiplication failed at c[1][1]");
+        assert(c[1][2] == 96)
+            else $error("matrix multiplication failed at c[1][2]");
+        assert(c[2][0] == -102)
+            else $error("matrix multiplication failed at c[2][0]");
+        assert(c[2][1] == 126)
+            else $error("matrix multiplication failed at c[2][1]");
+        assert(c[2][2] == -150)
+            else $error("matrix multiplication failed at c[2][2]");
+        
+
         $display("all tests passed!");
         $finish;
 
