@@ -11,16 +11,21 @@ module pe #(
     output logic signed [ACC_WIDTH-1:0] acc
 );
 
+    // add a pipelined register to save the multiplication result
+    logic signed [(2*WIDTH)-1:0] product_reg;
+
     always_ff @(posedge clk) begin
         if (reset) begin
             a_out <= '0;
             b_out <= '0;
+            product_reg <= '0;
             acc <= '0;
         end
         else begin
             a_out <= a_in;
             b_out <= b_in;
-            acc <= (acc + a_in * b_in);
+            product_reg <= a_in * b_in;
+            acc <= acc + product_reg;
         end
     end
 endmodule
