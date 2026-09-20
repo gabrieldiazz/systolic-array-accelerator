@@ -130,6 +130,9 @@ module systolic_array_file_tb;
         @(posedge clk);
         #1;
 
+        @(posedge clk);
+        #1;
+
         $display("C:");
         for (int i = 0; i < 3; i = i + 1) begin
             $display(
