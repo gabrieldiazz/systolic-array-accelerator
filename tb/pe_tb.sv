@@ -1,14 +1,15 @@
 module pe_tb;
     logic clk;
     logic reset;
-    logic [7:0] a_in;
-    logic [7:0] b_in;
-    logic [7:0] a_out;
-    logic [7:0] b_out;
-    logic [31:0] acc;
+    logic signed [7:0] a_in;
+    logic signed [7:0] b_in;
+    logic signed [7:0] a_out;
+    logic signed [7:0] b_out;
+    logic signed [31:0] acc;
 
     pe #(
-        .WIDTH(8)
+        .WIDTH(8),
+        .ACC_WIDTH(32)
     ) dut (
         .clk(clk),
         .reset(reset),
@@ -76,7 +77,60 @@ module pe_tb;
             else $error("new a_in did not propagate to a_out");
         assert(b_out == 5)
             else $error("new b_in did not propagate to b_out");
- 
+
+        reset = 1;
+        a_in = 0;
+        b_in = 0;
+
+        @(posedge clk);
+        #1;
+
+        assert(acc == 0)
+            else $error("reset did not work as intended");
+        assert(a_out == 0)
+            else $error("reset did not work as intended");
+        assert(b_out == 0)
+            else $error("reset did not work as intended");
+
+        reset = 0;
+        a_in = -3;
+        b_in = 4;
+
+        @(posedge clk);
+        #1;
+
+        assert(acc == -12)
+            else $error("negative x positive multiplication did not work");
+        assert(a_out == -3)
+            else $error("new a_in did not propagate to a_out");
+        assert(b_out == 4)
+            else $error("new b_in did not propagate to b_out");
+
+        a_in = 2;
+        b_in = 5;
+
+        @(posedge clk);
+        #1;
+
+        assert(acc == -2)
+            else $error("adding to negative output did not work");
+        assert(a_out == 2)
+            else $error("new a_in did not propagate to a_out");
+        assert(b_out == 5)
+            else $error("new b_in did not propagate to b_out");
+        
+        a_in = -2;
+        b_in = -3;
+
+        @(posedge clk);
+        #1;
+        
+        assert(acc == 4)
+            else $error("negative x negative multiplication did not work");
+        assert(a_out == -2)
+            else $error("negative a_in did not propagate to a_out");
+        assert(b_out == -3)
+            else $error("negative b_in did not propagate to b_out");
         
         $display("all tests passed!");
         $finish;

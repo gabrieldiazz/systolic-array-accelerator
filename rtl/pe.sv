@@ -1,13 +1,14 @@
 module pe #(
-    parameter WIDTH = 8
+    parameter WIDTH = 8,
+    parameter ACC_WIDTH = 32
 ) (
     input logic clk,
     input logic reset,
-    input logic [WIDTH-1:0] a_in,
-    input logic [WIDTH-1:0] b_in,
-    output logic [WIDTH-1:0] a_out,
-    output logic [WIDTH-1:0] b_out,
-    output logic [31:0] acc
+    input logic signed [WIDTH-1:0] a_in,
+    input logic signed [WIDTH-1:0] b_in,
+    output logic signed  [WIDTH-1:0] a_out,
+    output logic signed [WIDTH-1:0] b_out,
+    output logic signed [ACC_WIDTH-1:0] acc
 );
 
     always_ff @(posedge clk) begin
