@@ -1,0 +1,18 @@
+# Simulation build artifacts
+*.vvp
+*.vcd
+*.fst
+*.lxt
+*.lxt2
+
+# Verification-generated files
+verification/input.txt
+verification/output.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# OS/editor files
+.DS_Store
+Thumbs.db
