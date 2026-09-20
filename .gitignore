@@ -15,4 +15,7 @@ __pycache__/
 
 # OS/editor files
 .DS_Store
-Thumbs.db
+Thumbs.db.venv-librelane/
+
+# asic output files
+asic/runs
