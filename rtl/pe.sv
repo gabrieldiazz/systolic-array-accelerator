@@ -13,19 +13,25 @@ module pe #(
 
     // add a pipelined register to save the multiplication result
     logic signed [(2*WIDTH)-1:0] product_reg;
+    // add flag to avoid having to reset the product register
+    logic product_valid;
 
     always_ff @(posedge clk) begin
         if (reset) begin
             a_out <= '0;
             b_out <= '0;
-            product_reg <= '0;
+            product_valid <= 1'b0;
             acc <= '0;
         end
         else begin
             a_out <= a_in;
             b_out <= b_in;
             product_reg <= a_in * b_in;
-            acc <= acc + product_reg;
+            product_valid <= 1'b1;
+
+            if (product_valid == 1'b1) begin
+                acc <= acc + product_reg;
+            end
         end
     end
 endmodule
